@@ -1,11 +1,11 @@
 {
   "root": true,
-  "project": {
-    "name": "TechLog"
-  },
   "api": {
     "projectId": "nhi2xl63",
     "dataset": "production"
+  },
+  "project": {
+    "name": "TechLog"
   },
   "plugins": [
     "@sanity/base",
