@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import DefaultErrorPage from "next/error";
 import Head from "next/head";
-import BlockContent from '@sanity/block-content-to-react';
+import BlockContent from "@sanity/block-content-to-react";
 
 const builder = imageUrlBuilder(client);
 
@@ -27,23 +27,30 @@ export async function getStaticProps({ params }) {
   /* try and fetch data and then show data, if we dont get data -> 404 */
   const query = groq`
     *[_type == 'post' && slug.current == '${slug}'][0]{
-        ...,
-        'author': author->name
+      ...,
+      'author': author->name
     }
   `;
 
-  const data = await client.fetch(query);
-  // console.log(data);
+  try{
+    const data = await client.fetch(query);
+    console.log(data);
 
-  return {
-    revalidate: 60 * 60 * 24,
-    props: {
-      post: data,
-    },
-  };
+    return {
+      revalidate: 60 * 60 * 24,
+      props: {
+        post: data,
+      },
+    };
+  }
+  catch(err) {
+    return err;
+  }
+  // console.log(data);
 }
 
 const SinglePost = ({ post }) => {
+  // console.log(post);
   const router = useRouter();
 
   if (router.isFallback) {
@@ -51,7 +58,7 @@ const SinglePost = ({ post }) => {
     return <h1>Loading...</h1>;
   }
 
-  if (!post) {
+  if (post == undefined) {
     return (
       <>
         <Head>
@@ -69,15 +76,20 @@ const SinglePost = ({ post }) => {
           <h1 className="text-4xl font-bold text-gray-900 py-4">
             {post.title}
           </h1>
-          <div className='flex space-x-5 text-sm text-gray-500'>
+          <div className="flex space-x-5 text-sm text-gray-500">
             <span className="text-blue-500 block pb-4">{post.author}</span>
             <span>{new Date(post.publishedAt).toDateString()}</span>
           </div>
 
           <Image width={800} height={500} src={urlFor(post.mainImage).url()} />
 
-          <div className='prose max-w-2xl'>
-            <BlockContent blocks={post.body} />
+          <div className="prose max-w-2xl">
+            <BlockContent
+              blocks={post.body}
+              imageOptions={{w: 320, h: 240, fit: 'max'}}
+              projectId={client.projectId}
+              dataset={client.dataset}
+            />
           </div>
         </div>
       </div>

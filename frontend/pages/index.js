@@ -6,7 +6,7 @@ import Posts from "../components/Posts";
 export async function getStaticProps() {  // TODO: pagination for posts... (SWR with next)
   const query = groq`
   {
-    "posts": *[_type == 'post']{title, homeImage, publishedAt, slug,
+    "posts": *[_type == 'post']{title, mainImage, publishedAt, slug,
       'categories': categories[]->title,
       'authorName': author->name,
       'authorSlug': author->slug,
@@ -17,6 +17,7 @@ export async function getStaticProps() {  // TODO: pagination for posts... (SWR 
   `;
 
   const data = await client.fetch(query);
+  // console.log(data);
 
   return {
     props: {
